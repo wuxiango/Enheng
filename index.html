@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>嗯哼精选</title>
+    <meta name="description" content="按主题阅读 @EnHeng456 的精选帖子。观点来自原作者，不构成投资建议。" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script>
+      (function (l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search
+            .slice(1)
+            .split('&')
+            .map(function (s) {
+              return s.replace(/~and~/g, '&')
+            })
+            .join('?')
+          window.history.replaceState(null, '', l.pathname.slice(0, -1) + decoded + l.hash)
+        }
+      })(window.location)
+    </script>
+    <script>
+      (function () {
+        var saved = localStorage.getItem('theme')
+        var dark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.dataset.theme = saved || (dark ? 'dark' : 'light')
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

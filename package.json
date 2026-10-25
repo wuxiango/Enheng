@@ -1,0 +1,30 @@
+{
+  "name": "enheng-select",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx server/index.ts",
+    "test": "vitest run",
+    "seed": "tsx server/seed.ts",
+    "build": "vite build",
+    "build:pages": "vite build --mode pages && node scripts/copy-pages-data.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "html-to-image": "^1.11.13",
+    "lucide-react": "^1.61.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0",
+    "vitest": "^3.0.8"
+  }
+}

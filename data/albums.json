@@ -1,0 +1,35 @@
+{
+  "albums": [
+    {
+      "id": "celebrities",
+      "name": "嗯哼与名人",
+      "createdAt": "2026-10-25T00:00:00.000Z",
+      "photos": []
+    },
+    {
+      "id": "hotpot",
+      "name": "嗯哼火锅节",
+      "createdAt": "2026-10-25T00:00:01.000Z",
+      "photos": [
+        {
+          "id": "hotpot-close",
+          "file": "hotpot-close.jpg",
+          "caption": "2026年7月，成都火锅局落幕帖的封面",
+          "createdAt": "2026-07-14T08:24:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "meetup",
+      "name": "嗯哼见面会",
+      "createdAt": "2026-10-25T00:00:02.000Z",
+      "photos": []
+    },
+    {
+      "id": "other",
+      "name": "其他",
+      "createdAt": "2026-10-25T00:00:03.000Z",
+      "photos": []
+    }
+  ]
+}
