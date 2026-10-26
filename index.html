@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -23,12 +23,11 @@
     <script>
       (function () {
         var saved = localStorage.getItem('theme')
-        var dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.dataset.theme = saved || (dark ? 'dark' : 'light')
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved
       })()
     </script>
-    <script type="module" crossorigin src="/enheng-select/assets/index-BpmlpVnz.js"></script>
-    <link rel="stylesheet" crossorigin href="/enheng-select/assets/index-Dk7bSY4_.css">
+    <script type="module" crossorigin src="/enheng-select/assets/index-BwXUxYh_.js"></script>
+    <link rel="stylesheet" crossorigin href="/enheng-select/assets/index-BTRbQymY.css">
   </head>
   <body>
     <div id="root"></div>
