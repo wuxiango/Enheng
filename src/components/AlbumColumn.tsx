@@ -165,7 +165,7 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
         <NavLink to="/" className="logo" end aria-label="嗯哼精选">
           <img src={imageSrc(ENHENG_AVATAR)} alt="" />
         </NavLink>
-        <button type="button" onClick={onToggleTheme} aria-label={dark ? '切换到白天' : '切换到黑夜'}>
+        <button type="button" className="album-theme" onClick={onToggleTheme} aria-label={dark ? '切换到白天' : '切换到黑夜'}>
           {dark ? <Sun size={22} strokeWidth={2} /> : <Moon size={22} strokeWidth={2} />}
         </button>
         <NavLink to="/admin" className="admin-entry">

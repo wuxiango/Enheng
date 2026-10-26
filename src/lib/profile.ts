@@ -12,13 +12,13 @@ export const SOCIALS = [
     id: 'douyin',
     name: '抖音',
     handle: 'EnHeng嗯哼.Ai',
-    href: '',
+    href: 'https://v.douyin.com/UCBsIudaofY/',
   },
   {
     id: 'xiaohongshu',
     name: '小红书',
     handle: 'EnHeng嗯哼.Ai',
-    href: '',
+    href: 'https://xhslink.cn/o/4ph9H5JARTY',
   },
   {
     id: 'weibo',

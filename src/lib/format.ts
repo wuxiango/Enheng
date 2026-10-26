@@ -34,6 +34,24 @@ export function formatTweetTime(iso: string, now = new Date()): string {
   return `${dateText} ${hour}:${minute}`
 }
 
+export function formatStatusStamp(iso: string): { time: string; date: string } {
+  const date = new Date(iso)
+  const parts = new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date)
+  const pick = (type: string) => parts.find((part) => part.type === type)?.value ?? ''
+  return {
+    time: `${pick('hour')}:${pick('minute')}`,
+    date: `${pick('year')}年${pick('month')}月${pick('day')}日`,
+  }
+}
+
 export function imageSrc(url: string): string {
   if (!url) return ''
   if (import.meta.env.VITE_STATIC === 'true') {

@@ -70,17 +70,17 @@ function quoteFrom(quote: FxStatus | null | undefined): QuoteTweet | null {
   }
 }
 
-export function normalizeTimelineStatus(status: FxStatus): StoredTweet | null {
-  const own = isEnheng(status.author?.screen_name)
-  const repostedBy = isEnheng(status.reposted_by?.screen_name) ? status.reposted_by : null
-  if ((!own && !repostedBy) || !status.id || !status.text || !status.created_timestamp) return null
+function toStored(status: FxStatus, repostedBy: FxAuthor | null): StoredTweet | null {
+  if (!status.id || !status.text || !status.created_timestamp) return null
+  const handle = status.author?.screen_name || repostedBy?.screen_name || ''
+  if (!handle) return null
   return {
     id: String(status.id),
-    url: status.url || `https://x.com/${status.author?.screen_name || 'EnHeng456'}/status/${status.id}`,
+    url: status.url || `https://x.com/${handle}/status/${status.id}`,
     text: status.text,
     createdAt: new Date(status.created_timestamp * 1000).toISOString(),
-    authorName: status.author?.name || status.author?.screen_name || 'EnHeng嗯哼.Ai',
-    authorHandle: status.author?.screen_name || 'EnHeng456',
+    authorName: status.author?.name || status.author?.screen_name || repostedBy?.name || handle,
+    authorHandle: status.author?.screen_name || handle,
     authorAvatar: status.author?.avatar_url || '',
     verified: Boolean(status.author?.verification?.verified),
     media: mediaFrom(status.media),
@@ -96,6 +96,18 @@ export function normalizeTimelineStatus(status: FxStatus): StoredTweet | null {
       ? { name: repostedBy.name || 'EnHeng嗯哼.Ai', handle: repostedBy.screen_name || 'EnHeng456' }
       : null,
   }
+}
+
+export function normalizeTimelineStatus(status: FxStatus): StoredTweet | null {
+  const own = isEnheng(status.author?.screen_name)
+  const repostedBy = isEnheng(status.reposted_by?.screen_name) ? status.reposted_by ?? null : null
+  if (!own && !repostedBy) return null
+  return toStored(status, repostedBy)
+}
+
+export function statusFromFx(status: FxStatus): StoredTweet | null {
+  const repostedBy = isEnheng(status.reposted_by?.screen_name) ? status.reposted_by ?? null : null
+  return toStored(status, repostedBy)
 }
 
 export function readTimeline(payload: { results?: FxStatus[]; cursor?: { bottom?: string | null } }): TimelinePage {
@@ -118,4 +130,15 @@ export async function fetchTimelinePage(cursor?: string): Promise<TimelinePage> 
   const payload = (await response.json()) as { code?: number; results?: FxStatus[]; cursor?: { bottom?: string | null } }
   if (payload.code !== 200) throw new Error('主页暂时没有拉下来')
   return readTimeline(payload)
+}
+
+export async function fetchStatus(id: string): Promise<StoredTweet | null> {
+  const response = await fetch(`https://api.fxtwitter.com/EnHeng456/status/${encodeURIComponent(id)}`, {
+    headers: { accept: 'application/json' },
+    signal: AbortSignal.timeout(15000),
+  })
+  if (!response.ok) return null
+  const payload = (await response.json()) as { code?: number; tweet?: FxStatus }
+  if (payload.code !== 200 || !payload.tweet) return null
+  return statusFromFx(payload.tweet)
 }

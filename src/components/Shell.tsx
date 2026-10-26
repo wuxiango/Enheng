@@ -7,7 +7,7 @@ import { SiteNav } from './SiteNav'
 import { SocialDock } from './SocialDock'
 
 export function Shell() {
-  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'light')
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'dark')
   const dark = theme === 'dark'
 
   function toggleTheme() {
@@ -19,7 +19,7 @@ export function Shell() {
 
   return (
     <AdminSessionProvider>
-      <SiteNav />
+      <SiteNav dark={dark} onToggleTheme={toggleTheme} />
       <div className="app">
         <AlbumColumn dark={dark} onToggleTheme={toggleTheme} />
         <main className="column">
