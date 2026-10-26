@@ -3,6 +3,7 @@ import {
   BarChart3,
   Camera,
   Heart,
+  Images,
   MessageCircle,
   Play,
   Repeat2,
@@ -29,6 +30,10 @@ export function IconViews(props: LucideProps) {
 
 export function IconShot(props: LucideProps) {
   return <Camera {...stroke} {...props} />
+}
+
+export function IconLongShot(props: LucideProps) {
+  return <Images {...stroke} {...props} />
 }
 
 export function IconBack(props: LucideProps) {

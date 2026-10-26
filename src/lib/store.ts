@@ -37,5 +37,14 @@ export function createStore(file: string) {
       write(next)
       return true
     },
+    setFeatured(id: string, featured: boolean): boolean {
+      const tweets = read()
+      const tweet = tweets.find((item) => item.id === id)
+      if (!tweet) return false
+      if (featured) tweet.featured = true
+      else delete tweet.featured
+      write(tweets)
+      return true
+    },
   }
 }

@@ -39,4 +39,16 @@ describe('createStore', () => {
     expect(store.list()).toEqual([])
     expect(store.remove('9')).toBe(false)
   })
+
+  it('只有主动标记的帖子算精选', () => {
+    const file = join(mkdtempSync(join(tmpdir(), 'enheng-')), 'tweets.json')
+    const store = createStore(file)
+    store.add(sample('1', '2026-10-01T00:00:00.000Z'))
+    expect(store.list()[0].featured).toBeUndefined()
+    expect(store.setFeatured('1', true)).toBe(true)
+    expect(store.list()[0].featured).toBe(true)
+    expect(store.setFeatured('1', false)).toBe(true)
+    expect(store.list()[0].featured).toBeUndefined()
+    expect(store.setFeatured('missing', true)).toBe(false)
+  })
 })

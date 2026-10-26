@@ -1,4 +1,5 @@
 export const ENHENG_AVATAR = 'https://pbs.twimg.com/profile_images/1966152812536147968/nzlqBIZQ_200x200.jpg'
+export const ENHENG_USER_ID = '1509912900038582272'
 
 export const SOCIALS = [
   {
@@ -18,5 +19,11 @@ export const SOCIALS = [
     name: '小红书',
     handle: 'EnHeng嗯哼.Ai',
     href: '',
+  },
+  {
+    id: 'weibo',
+    name: '微博',
+    handle: '嗯哼_何时进化',
+    href: 'https://weibo.com/u/6250319654',
   },
 ] as const

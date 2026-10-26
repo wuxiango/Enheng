@@ -8,7 +8,8 @@ import { passwordsMatch } from '../src/lib/password'
 import { createLoginGuard } from '../src/lib/loginGuard'
 import { signSession, verifySession } from '../src/lib/session'
 import { createStore } from '../src/lib/store'
-import { isCuratedAuthor, parseTweetUrl } from '../src/lib/url'
+import type { StoredTweet } from '../src/lib/types'
+import { isCuratedAuthor, parseTweetBatch, parseTweetUrl } from '../src/lib/url'
 
 export const root = process.env.VERCEL ? process.cwd() : join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -117,6 +118,41 @@ app.post('/api/admin/logout', (_req, res) => {
   res.json({ ok: true })
 })
 
+app.post('/api/admin/tweets/batch', async (req, res) => {
+  if (!isAdmin(req.headers.cookie)) {
+    res.status(401).json({ error: '需要管理员登录' })
+    return
+  }
+  const batch = parseTweetBatch(String(req.body?.text || ''))
+  if (batch.items.length === 0 && batch.rejected.length === 0 && batch.duplicates === 0) {
+    res.status(400).json({ error: '请贴帖子链接，一行一条' })
+    return
+  }
+  const added: StoredTweet[] = []
+  const failed = [...batch.rejected]
+  let duplicates = batch.duplicates
+  for (const item of batch.items) {
+    if (!isCuratedAuthor(item.handle)) {
+      failed.push({ raw: item.raw, error: '只能收录 @EnHeng456 的帖子' })
+      continue
+    }
+    try {
+      const tweet = await fetchTweet(item.id)
+      if (req.body?.featured === true) tweet.featured = true
+      store.add(tweet)
+      added.push(tweet)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '收录失败'
+      if (message.includes('已经收录')) {
+        duplicates += 1
+        continue
+      }
+      failed.push({ raw: item.raw, error: message })
+    }
+  }
+  res.json({ added, failed, overflow: batch.overflow, duplicates })
+})
+
 app.post('/api/admin/tweets', async (req, res) => {
   if (!isAdmin(req.headers.cookie)) {
     res.status(401).json({ error: '需要管理员登录' })
@@ -133,6 +169,7 @@ app.post('/api/admin/tweets', async (req, res) => {
   }
   try {
     const tweet = await fetchTweet(parsed.id)
+    if (req.body?.featured === true) tweet.featured = true
     store.add(tweet)
     res.status(201).json({ tweet })
   } catch (error) {
@@ -140,6 +177,20 @@ app.post('/api/admin/tweets', async (req, res) => {
     const status = message.includes('已经收录') ? 409 : 502
     res.status(status).json({ error: message })
   }
+})
+
+app.post('/api/admin/tweets/:id/featured', (req, res) => {
+  if (!isAdmin(req.headers.cookie)) {
+    res.status(401).json({ error: '需要管理员登录' })
+    return
+  }
+  const featured = req.body?.featured === true
+  const updated = store.setFeatured(req.params.id, featured)
+  if (!updated) {
+    res.status(404).json({ error: '没有这条帖子' })
+    return
+  }
+  res.json({ ok: true, featured })
 })
 
 app.delete('/api/admin/tweets/:id', (req, res) => {

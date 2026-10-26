@@ -1,11 +1,11 @@
 import {
+  Bookmark,
   Bot,
   Clock3,
   Coffee,
   Hash,
-  Landmark,
   LayoutGrid,
-  Rocket,
+  MessageSquare,
   TrendingUp,
   UserRound,
   type LucideIcon,
@@ -14,11 +14,11 @@ import {
 export const TOPIC_ICONS: Record<string, { icon: LucideIcon; tint: string }> = {
   home: { icon: LayoutGrid, tint: '#1d9bf0' },
   latest: { icon: Clock3, tint: '#1d9bf0' },
-  ai: { icon: Bot, tint: '#7856ff' },
+  picks: { icon: Bookmark, tint: '#a16207' },
   market: { icon: TrendingUp, tint: '#00ba7c' },
-  projects: { icon: Rocket, tint: '#ff7a00' },
-  exchanges: { icon: Landmark, tint: '#f5a623' },
+  views: { icon: MessageSquare, tint: '#8a5a2a' },
   people: { icon: UserRound, tint: '#f91880' },
+  ai: { icon: Bot, tint: '#7856ff' },
   life: { icon: Coffee, tint: '#8e5b3a' },
   other: { icon: Hash, tint: '#536471' },
 }

@@ -1,4 +1,4 @@
-export type CategoryId = 'ai' | 'market' | 'projects' | 'exchanges' | 'people' | 'life' | 'other'
+export type CategoryId = 'market' | 'views' | 'people' | 'ai' | 'life' | 'other'
 
 export type Media = {
   type: 'photo' | 'video'
@@ -33,4 +33,6 @@ export type StoredTweet = {
     views: number
   }
   categories: CategoryId[]
+  featured?: boolean
+  repostedBy?: { name: string; handle: string } | null
 }
