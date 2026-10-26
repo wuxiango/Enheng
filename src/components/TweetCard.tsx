@@ -93,6 +93,17 @@ function fileExtension(type: string, url: string): string {
   return 'jpg'
 }
 
+function dataUrlToBlob(dataUrl: string): Blob {
+  const comma = dataUrl.indexOf(',')
+  const header = comma >= 0 ? dataUrl.slice(0, comma) : ''
+  const payload = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl
+  const mime = /data:([^;,]+)/.exec(header)?.[1] || 'image/png'
+  const binary = atob(payload)
+  const bytes = new Uint8Array(binary.length)
+  for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index)
+  return new Blob([bytes], { type: mime })
+}
+
 function pictureList(tweet: StoredTweet): Media[] {
   const seen = new Set<string>()
   return [...tweet.media, ...(tweet.quote?.media ?? [])].filter((item) => {
@@ -107,7 +118,7 @@ function phoneSave(): boolean {
 }
 
 async function shotItem(dataUrl: string, name: string): Promise<ShotItem> {
-  const blob = await (await fetch(dataUrl)).blob()
+  const blob = dataUrl.startsWith('data:') ? dataUrlToBlob(dataUrl) : await (await fetch(dataUrl)).blob()
   const file = new File([blob], name, { type: blob.type || 'image/png' })
   return { href: URL.createObjectURL(file), name, file }
 }

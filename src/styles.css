@@ -287,6 +287,13 @@ button { display: inline-flex; align-items: center; gap: 6px; }
   display: block;
 }
 
+.brand-link img.xhs-mark {
+  width: 50px;
+  height: 23px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
 .brand-link svg { width: 36px; height: 36px; display: block; }
 .brand-link.on,
 .brand-link:hover { background: var(--hover); }
@@ -660,10 +667,14 @@ dialog.lightbox[open] {
 .profile-id h1 {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: 4px;
   margin: 0;
+  min-width: 0;
+  overflow: hidden;
   font-size: 20px;
   line-height: 24px;
+  white-space: nowrap;
 }
 .profile-id a {
   color: var(--secondary);
@@ -822,14 +833,33 @@ dialog.lightbox[open] {
 .tweet-head {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: 4px;
   min-width: 0;
+  overflow: hidden;
   font-size: 15px;
   line-height: 20px;
+  height: 20px;
 }
 
 .tweet-head a { color: inherit; text-decoration: none; }
-.tweet-head strong { font-weight: 700; }
+.tweet-head > a:first-child {
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: calc(100% - 132px);
+  overflow: hidden;
+}
+.tweet-head strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.tweet-head .badge,
+.tweet-head .dot,
+.tweet-head .time { flex: none; }
+.tweet-head .handle { flex: 0 1 auto; min-width: 0; }
 .handle, .time, .dot { color: var(--secondary); }
 .handle, .time { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tweet-head a:hover strong,
@@ -926,7 +956,13 @@ dialog.lightbox[open] {
   object-fit: cover;
 }
 
-.quote-head strong { font-weight: 700; }
+.quote-head strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
 .quote-head span { color: var(--secondary); }
 .quote .media img { max-height: 280px; }
 
@@ -952,10 +988,17 @@ dialog.lightbox[open] {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   max-width: none;
   margin: 4px -8px 0;
   color: var(--secondary);
+}
+
+.shot-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
 }
 
 .metric,
@@ -1015,17 +1058,28 @@ dialog.lightbox[open] {
 
 .status-author .who {
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-width: 0;
 }
 
 .status-author strong {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 4px;
+  flex-wrap: nowrap;
+  gap: 2px;
+  min-width: 0;
+  max-width: 100%;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 20px;
+}
+
+.status-author .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .status-author .handle {
