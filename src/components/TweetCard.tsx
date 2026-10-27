@@ -1,5 +1,5 @@
 import { toPng } from 'html-to-image'
-import { useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useNavigate } from 'react-router-dom'
 import { CATEGORIES } from '../lib/classify'
@@ -93,6 +93,43 @@ function fileExtension(type: string, url: string): string {
   return 'jpg'
 }
 
+function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result || ''))
+    reader.onerror = () => reject(new Error('read'))
+    reader.readAsDataURL(blob)
+  })
+}
+
+async function paintImages(root: HTMLElement) {
+  const images = [...root.querySelectorAll('img')]
+  await Promise.all(
+    images.map(async (img) => {
+      const src = img.currentSrc || img.src
+      if (!src || src.startsWith('data:')) return
+      try {
+        const response = await fetch(src, { signal: AbortSignal.timeout(20000) })
+        if (!response.ok) return
+        const blob = await response.blob()
+        if (!blob.type.startsWith('image/')) return
+        img.src = await blobToDataUrl(blob)
+        await img.decode?.().catch(() => undefined)
+      } catch {
+        return
+      }
+      const width = img.clientWidth
+      let height = img.clientHeight
+      const ratio = img.naturalWidth > 0 ? img.naturalHeight / img.naturalWidth : 0
+      if (width > 0 && height < 2 && ratio > 0) height = Math.round(width * ratio)
+      if (width > 0 && height > 0) {
+        img.style.width = `${width}px`
+        img.style.height = `${height}px`
+      }
+    }),
+  )
+}
+
 function dataUrlToBlob(dataUrl: string): Blob {
   const comma = dataUrl.indexOf(',')
   const header = comma >= 0 ? dataUrl.slice(0, comma) : ''
@@ -137,12 +174,103 @@ async function renderPng(node: HTMLElement, backgroundColor: string, filter: (do
   }
 }
 
+function usePhone() {
+  const query = '(max-width: 700px)'
+  const [phone, setPhone] = useState(() => window.matchMedia(query).matches)
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    const sync = () => setPhone(media.matches)
+    sync()
+    media.addEventListener('change', sync)
+    return () => media.removeEventListener('change', sync)
+  }, [])
+  return phone
+}
+
+function TweetFrame({
+  tweet,
+  dark,
+  frameRef,
+}: {
+  tweet: StoredTweet
+  dark: boolean
+  frameRef: React.RefObject<HTMLElement | null>
+}) {
+  const stamp = formatStatusStamp(tweet.createdAt)
+  const photos = tweet.media.slice(0, 4)
+  return (
+    <article ref={frameRef} className="x-card" data-mode={dark ? 'dark' : 'light'}>
+      {tweet.repostedBy ? (
+        <p className="x-repost">
+          <IconRepost size={14} />
+          嗯哼转发
+        </p>
+      ) : null}
+      <header className="x-author">
+        <img className="x-avatar" alt="" src={imageSrc(tweet.authorAvatar)} />
+        <div className="x-who">
+          <strong>
+            <span>{tweet.authorName}</span>
+            {tweet.verified ? <VerifiedBadge /> : null}
+          </strong>
+          <span className="x-handle">@{tweet.authorHandle}</span>
+        </div>
+      </header>
+      {tweet.text ? <TweetText text={tweet.text} /> : null}
+      {photos.length > 0 ? (
+        <div className={`x-photos n${photos.length}`}>
+          {photos.map((item) => (
+            <div key={item.url} className="x-photo">
+              <img alt="" src={imageSrc(item.url)} />
+              {item.type === 'video' ? (
+                <span className="play">
+                  <IconPlay size={16} />
+                </span>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {tweet.quote ? <Quote quote={tweet.quote} /> : null}
+      <p className="x-time">
+        <span>{stamp.time}</span>
+        <span> · </span>
+        <span>{stamp.date}</span>
+        <span> · </span>
+        <strong>{formatCount(tweet.metrics.views)}</strong>
+        <span> 查看</span>
+      </p>
+      <div className="x-actions">
+        <span>
+          <IconReply size={18} />
+          {formatCount(tweet.metrics.replies)}
+        </span>
+        <span>
+          <IconRepost size={18} />
+          {formatCount(tweet.metrics.retweets)}
+        </span>
+        <span>
+          <IconLike size={18} />
+          {formatCount(tweet.metrics.likes)}
+        </span>
+        <span>
+          <IconViews size={18} />
+          {formatCount(tweet.metrics.views)}
+        </span>
+      </div>
+    </article>
+  )
+}
+
 export function TweetCard({ tweet, layout = 'feed' }: { tweet: StoredTweet; layout?: 'feed' | 'post' }) {
   const navigate = useNavigate()
+  const phone = usePhone()
   const cardRef = useRef<HTMLElement>(null)
+  const frameRef = useRef<HTMLElement>(null)
   const busyRef = useRef(false)
   const [shotError, setShotError] = useState('')
   const [longBusy, setLongBusy] = useState(false)
+  const [framing, setFraming] = useState(false)
   const [sheet, setSheet] = useState<ShotItem[] | null>(null)
   const names = CATEGORIES.filter((item) => tweet.categories.includes(item.id))
   const stamp = formatStatusStamp(tweet.createdAt)
@@ -189,9 +317,44 @@ export function TweetCard({ tweet, layout = 'feed' }: { tweet: StoredTweet; layo
     navigate(`/status/${tweet.id}`)
   }
 
+  useEffect(() => {
+    if (!framing) return
+    let cancel = false
+    const run = async () => {
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+      const node = frameRef.current
+      if (!node || cancel) return
+      await paintImages(node)
+      if (cancel) return
+      const dark = document.documentElement.dataset.theme !== 'light'
+      const dataUrl = await renderPng(node, dark ? '#000000' : '#ffffff', () => true)
+      if (cancel) return
+      deliver([await shotItem(dataUrl, `enheng-${tweet.id}.png`)])
+    }
+    run()
+      .catch(() => {
+        if (!cancel) setShotError('这张图没有保存下来，可以再试一次')
+      })
+      .finally(() => {
+        if (cancel) return
+        setFraming(false)
+        busyRef.current = false
+      })
+    return () => {
+      cancel = true
+    }
+  }, [framing, tweet.id])
+
   async function shoot() {
+    if (busyRef.current) return
+    if (phoneSave()) {
+      busyRef.current = true
+      setShotError('')
+      setFraming(true)
+      return
+    }
     const node = cardRef.current
-    if (!node || busyRef.current) return
+    if (!node) return
     busyRef.current = true
     setShotError('')
     try {
@@ -299,20 +462,44 @@ export function TweetCard({ tweet, layout = 'feed' }: { tweet: StoredTweet; layo
         </span>
         {formatCount(tweet.metrics.views)}
       </span>
-      <button type="button" className="shot no-shot" onClick={() => void shoot()} disabled={longBusy}>
+      {phone ? null : (
+        <>
+          <button type="button" className="shot no-shot" onClick={() => void shoot()} disabled={longBusy}>
+            <span className="hit">
+              <IconShot size={18} />
+            </span>
+            截图
+          </button>
+          <button type="button" className="shot shot-long no-shot" onClick={() => void shootLong()} disabled={longBusy}>
+            <span className="hit">
+              <IconLongShot size={18} />
+            </span>
+            {longBusy ? '正在保存' : '长文截图'}
+          </button>
+        </>
+      )}
+    </div>
+  )
+
+  const phoneShot = phone ? (
+    <div className="shot-row no-shot">
+      <button type="button" className="shot" onClick={() => void shoot()} disabled={longBusy}>
         <span className="hit">
           <IconShot size={18} />
         </span>
         截图
       </button>
-      <button type="button" className="shot no-shot" onClick={() => void shootLong()} disabled={longBusy}>
-        <span className="hit">
-          <IconLongShot size={18} />
-        </span>
-        {longBusy ? '正在保存' : '长文截图'}
-      </button>
     </div>
-  )
+  ) : null
+
+  const frameNode = framing
+    ? createPortal(
+        <div className="x-stage" aria-hidden="true">
+          <TweetFrame tweet={tweet} dark={document.documentElement.dataset.theme !== 'light'} frameRef={frameRef} />
+        </div>,
+        document.body,
+      )
+    : null
 
   const sheetNode = sheet
     ? createPortal(
@@ -346,7 +533,7 @@ export function TweetCard({ tweet, layout = 'feed' }: { tweet: StoredTweet; layo
             <img className="avatar" src={imageSrc(tweet.authorAvatar)} alt="" />
             <div className="who">
               <strong>
-                {tweet.authorName}
+                <span className="name">{tweet.authorName}</span>
                 {tweet.verified ? <VerifiedBadge /> : null}
               </strong>
               <span className="handle">@{tweet.authorHandle}</span>
@@ -364,10 +551,12 @@ export function TweetCard({ tweet, layout = 'feed' }: { tweet: StoredTweet; layo
             <strong>{formatCount(tweet.metrics.views)}</strong>
             <span> 查看</span>
           </p>
-          {topics}
           {actions}
+          {phoneShot}
+          {topics}
           {shotError ? <p className="shot-error no-shot">{shotError}</p> : null}
         </article>
+        {frameNode}
         {sheetNode}
       </>
     )
@@ -394,13 +583,15 @@ export function TweetCard({ tweet, layout = 'feed' }: { tweet: StoredTweet; layo
           </header>
           <TweetText text={tweet.text} />
           <p className="shot-more">后面还有，全文在页面上</p>
-          {tweet.quote ? <Quote quote={tweet.quote} /> : null}
           <MediaGrid media={tweet.media} linkFor={() => tweet.url} />
-          {topics}
+          {tweet.quote ? <Quote quote={tweet.quote} /> : null}
           {actions}
+          {phoneShot}
+          {topics}
           {shotError ? <p className="shot-error no-shot">{shotError}</p> : null}
         </div>
       </article>
+      {frameNode}
       {sheetNode}
     </>
   )
