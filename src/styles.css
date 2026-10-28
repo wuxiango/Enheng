@@ -1635,9 +1635,10 @@ button { display: inline-flex; align-items: center; gap: 6px; }
 .admin-list p {
   margin: 4px 0 0;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 1180px) {

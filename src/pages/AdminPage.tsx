@@ -258,25 +258,6 @@ export function AdminPage() {
               ))}
             </ul>
           ) : null}
-          <ul className="admin-list">
-            {tweets.map((tweet) => (
-              <li key={tweet.id}>
-                <div>
-                  <time dateTime={tweet.createdAt}>{formatTweetTime(tweet.createdAt)}</time>
-                  <p>{tweet.text}</p>
-                </div>
-                <div className="admin-item-actions">
-                  <button type="button" className={tweet.featured ? 'picked' : 'ghost'} onClick={() => void toggleFeatured(tweet)}>
-                    {tweet.featured ? '移出精选' : '放入精选'}
-                  </button>
-                  <button type="button" className="danger" onClick={() => remove(tweet)}>
-                    <Trash2 size={16} strokeWidth={1.75} />
-                    删除
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
         </>
       ) : null}
       {message ? <p className="status">{message}</p> : null}
