@@ -1625,6 +1625,11 @@ button { display: inline-flex; align-items: center; gap: 6px; }
   border-top: 1px solid var(--border);
 }
 
+.admin-list li > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
 .admin-list time { color: var(--secondary); font-size: 13px; }
 
 .admin-list p {

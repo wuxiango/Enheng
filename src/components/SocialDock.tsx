@@ -1,5 +1,6 @@
 import { House } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { type MouseEvent } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { imageSrc } from '../lib/format'
 import { ENHENG_AVATAR, SOCIALS } from '../lib/profile'
 
@@ -51,8 +52,23 @@ function WeiboLogo() {
 
 const XHS_MARK = `${import.meta.env.BASE_URL}xiaohongshu.png`
 
+function scrollHomeTop() {
+  window.scrollTo(0, 0)
+  document.documentElement.scrollTop = 0
+  document.body.scrollTop = 0
+}
+
 export function SocialDock() {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
+
+  function onHome(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault()
+    if (pathname !== '/') navigate('/')
+    scrollHomeTop()
+    requestAnimationFrame(scrollHomeTop)
+  }
+
   return (
     <footer className="social-dock">
       <div className="social-row">
@@ -70,7 +86,7 @@ export function SocialDock() {
         </a>
       </div>
       <nav className="dock-tabs" aria-label="快捷入口">
-        <Link className={pathname === '/' ? 'dock-tab on' : 'dock-tab'} to="/" aria-label="首页">
+        <Link className={pathname === '/' ? 'dock-tab on' : 'dock-tab'} to="/" aria-label="首页" onClick={onHome}>
           <House size={26} strokeWidth={1.75} />
           <span>首页</span>
         </Link>

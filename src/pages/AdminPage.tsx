@@ -6,6 +6,15 @@ import type { StoredTweet } from '../lib/types'
 import { formatTweetTime } from '../lib/format'
 import { stripDuplicateLinks } from '../lib/url'
 
+function matchesTweet(tweet: StoredTweet, query: string) {
+  const raw = query.trim()
+  if (!raw) return true
+  const id = raw.match(/status\/(\d+)/)?.[1]
+  if (id) return tweet.id === id
+  const needle = raw.toLowerCase()
+  return tweet.text.toLowerCase().includes(needle) || tweet.id.includes(raw)
+}
+
 export function AdminPage() {
   const { authed, setAuthed } = useAdminSession()
   const [password, setPassword] = useState('')
@@ -17,6 +26,8 @@ export function AdminPage() {
   const [busy, setBusy] = useState(false)
   const [featureOne, setFeatureOne] = useState(false)
   const [featureBatch, setFeatureBatch] = useState(false)
+  const [query, setQuery] = useState('')
+  const visible = tweets.filter((tweet) => matchesTweet(tweet, query))
 
   async function loadTweets() {
     const response = await fetch('/api/tweets')
@@ -168,6 +179,35 @@ export function AdminPage() {
       ) : null}
       {authed ? (
         <>
+          <form className="admin-form" onSubmit={(event) => event.preventDefault()}>
+            <label htmlFor="tweet-find">已收录 {tweets.length} 条，可删除其中某一条</label>
+            <input
+              id="tweet-find"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="搜索文字，或贴要删除的帖子链接"
+            />
+          </form>
+          {query.trim() && visible.length === 0 ? <p className="status">没有找到这条收录</p> : null}
+          <ul className="admin-list">
+            {visible.map((tweet) => (
+              <li key={tweet.id}>
+                <div>
+                  <time dateTime={tweet.createdAt}>{formatTweetTime(tweet.createdAt)}</time>
+                  <p>{tweet.text}</p>
+                </div>
+                <div className="admin-item-actions">
+                  <button type="button" className={tweet.featured ? 'picked' : 'ghost'} onClick={() => void toggleFeatured(tweet)}>
+                    {tweet.featured ? '移出精选' : '放入精选'}
+                  </button>
+                  <button type="button" className="danger" onClick={() => remove(tweet)}>
+                    <Trash2 size={16} strokeWidth={1.75} />
+                    删除
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
           <form className="admin-form" onSubmit={addTweet}>
             <label htmlFor="tweet-url">帖子链接</label>
             <input
