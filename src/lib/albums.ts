@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
+import { sortAlbumPhotos } from './albumOrder'
 import type { Album, AlbumPhoto } from './albumTypes'
 
 type FileShape = { albums: Album[] }
@@ -9,12 +10,13 @@ export function createAlbumStore(file: string) {
   function read(): Album[] {
     if (!existsSync(file)) return []
     const parsed = JSON.parse(readFileSync(file, 'utf8')) as FileShape
-    return parsed.albums ?? []
+    return (parsed.albums ?? []).map((album) => ({ ...album, photos: sortAlbumPhotos(album.photos) }))
   }
 
   function write(albums: Album[]) {
+    const ordered = albums.map((album) => ({ ...album, photos: sortAlbumPhotos(album.photos) }))
     mkdirSync(dirname(file), { recursive: true })
-    writeFileSync(file, JSON.stringify({ albums }, null, 2))
+    writeFileSync(file, JSON.stringify({ albums: ordered }, null, 2))
   }
 
   return {

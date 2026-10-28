@@ -31,6 +31,19 @@ describe('createAlbumStore', () => {
     expect(store.list()).toEqual([])
     expect(store.removePhoto(album.id, 'p1')).toBeNull()
   })
+
+  it('按照片名字排序，同名的排在一起，没名字的放在后面', () => {
+    const file = join(mkdtempSync(join(tmpdir(), 'enheng-')), 'albums.json')
+    const store = createAlbumStore(file)
+    const album = store.add('名人')
+    store.addPhoto(album.id, { id: 'a', file: 'a.jpg', caption: '乙', createdAt: '2026-01-02T00:00:00.000Z' })
+    store.addPhoto(album.id, { id: 'b', file: 'b.jpg', caption: '', createdAt: '2026-01-01T00:00:00.000Z' })
+    store.addPhoto(album.id, { id: 'c', file: 'c.jpg', caption: '甲', createdAt: '2026-01-03T00:00:00.000Z' })
+    store.addPhoto(album.id, { id: 'd', file: 'd.jpg', caption: '乙', createdAt: '2026-01-04T00:00:00.000Z' })
+    expect(store.list()[0]?.photos.map((photo) => photo.id)).toEqual(['c', 'a', 'd', 'b'])
+    expect(store.updatePhoto(album.id, 'c', '乙')).toBe(true)
+    expect(store.list()[0]?.photos.map((photo) => photo.id)).toEqual(['a', 'c', 'd', 'b'])
+  })
 })
 
 describe('decodeImageDataUrl', () => {

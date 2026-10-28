@@ -4,7 +4,134 @@
       "id": "celebrities",
       "name": "嗯哼与名人",
       "createdAt": "2026-10-25T00:00:00.000Z",
-      "photos": []
+      "photos": [
+        {
+          "id": "a99de444-25b5-4a38-8f8d-147d11b8a730",
+          "file": "a99de444-25b5-4a38-8f8d-147d11b8a730.jpg",
+          "caption": "嗯哼和大师",
+          "createdAt": "2026-10-28T14:04:40.315Z"
+        },
+        {
+          "id": "a1b3dbe5-d5a9-429b-a17d-2b8c32ebbf6d",
+          "file": "a1b3dbe5-d5a9-429b-a17d-2b8c32ebbf6d.jpg",
+          "caption": "嗯哼和群星",
+          "createdAt": "2026-10-28T14:01:20.342Z"
+        },
+        {
+          "id": "06b7417a-8894-4b68-be5f-5534314bcf06",
+          "file": "06b7417a-8894-4b68-be5f-5534314bcf06.jpg",
+          "caption": "嗯哼和宋亚东",
+          "createdAt": "2026-10-28T13:42:11.874Z"
+        },
+        {
+          "id": "a65bec1f-2b6b-4833-9dbc-e81b345b7998",
+          "file": "a65bec1f-2b6b-4833-9dbc-e81b345b7998.jpg",
+          "caption": "嗯哼和宋亚东",
+          "createdAt": "2026-10-28T13:43:07.660Z"
+        },
+        {
+          "id": "c254ef79-3290-45aa-b28f-a65136c970b7",
+          "file": "c254ef79-3290-45aa-b28f-a65136c970b7.jpg",
+          "caption": "嗯哼和宋亚东",
+          "createdAt": "2026-10-28T13:43:31.918Z"
+        },
+        {
+          "id": "03c40b68-807a-4e32-b339-782413a5faca",
+          "file": "03c40b68-807a-4e32-b339-782413a5faca.jpg",
+          "caption": "嗯哼和宋亚东",
+          "createdAt": "2026-10-28T14:02:56.391Z"
+        },
+        {
+          "id": "f70387df-a981-4a43-ab07-29eac5c338da",
+          "file": "f70387df-a981-4a43-ab07-29eac5c338da.jpg",
+          "caption": "嗯哼和孙宇晨",
+          "createdAt": "2026-10-28T13:37:08.492Z"
+        },
+        {
+          "id": "e69b8c11-839e-4fe0-bbcd-24db7736dab4",
+          "file": "e69b8c11-839e-4fe0-bbcd-24db7736dab4.jpg",
+          "caption": "嗯哼和孙宇晨",
+          "createdAt": "2026-10-28T13:39:43.199Z"
+        },
+        {
+          "id": "b3b27f44-0816-482a-9bbe-210c16a70273",
+          "file": "b3b27f44-0816-482a-9bbe-210c16a70273.jpg",
+          "caption": "嗯哼和孙宇晨",
+          "createdAt": "2026-10-28T14:05:32.896Z"
+        },
+        {
+          "id": "75d0b3e2-a0fb-4564-b734-b2520a76e805",
+          "file": "75d0b3e2-a0fb-4564-b734-b2520a76e805.jpg",
+          "caption": "嗯哼和孙宇晨",
+          "createdAt": "2026-10-28T14:06:25.917Z"
+        },
+        {
+          "id": "5b91d440-1dce-41ca-ad8b-74cd58ba12c1",
+          "file": "5b91d440-1dce-41ca-ad8b-74cd58ba12c1.jpg",
+          "caption": "嗯哼和孙宇晨",
+          "createdAt": "2026-10-28T14:06:44.619Z"
+        },
+        {
+          "id": "3092630f-7158-4216-9cf6-898fe0d75df8",
+          "file": "3092630f-7158-4216-9cf6-898fe0d75df8.jpg",
+          "caption": "嗯哼和孙宇晨",
+          "createdAt": "2026-10-28T14:08:01.645Z"
+        },
+        {
+          "id": "b8e4c16e-9fee-46f8-b3c5-1da90263bcf3",
+          "file": "b8e4c16e-9fee-46f8-b3c5-1da90263bcf3.jpg",
+          "caption": "嗯哼和王嘉尔",
+          "createdAt": "2026-10-28T13:58:06.234Z"
+        },
+        {
+          "id": "93f7699a-ef56-4833-94c9-e427bfd0c285",
+          "file": "93f7699a-ef56-4833-94c9-e427bfd0c285.jpg",
+          "caption": "嗯哼和旭日宝宝",
+          "createdAt": "2026-10-28T13:59:17.038Z"
+        },
+        {
+          "id": "62306dc5-b95e-4442-92d5-c16d14e5907e",
+          "file": "62306dc5-b95e-4442-92d5-c16d14e5907e.jpg",
+          "caption": "嗯哼和一姐",
+          "createdAt": "2026-10-28T14:01:49.318Z"
+        },
+        {
+          "id": "ac47ecd3-c214-4c1a-9fd1-647a1f21f763",
+          "file": "ac47ecd3-c214-4c1a-9fd1-647a1f21f763.jpg",
+          "caption": "嗯哼和一姐",
+          "createdAt": "2026-10-28T14:02:02.201Z"
+        },
+        {
+          "id": "5a4d781b-20a5-4c74-846a-3faaab364efe",
+          "file": "5a4d781b-20a5-4c74-846a-3faaab364efe.jpg",
+          "caption": "嗯哼和BN的CEO",
+          "createdAt": "2026-10-28T14:05:56.799Z"
+        },
+        {
+          "id": "c809be4f-829e-46d8-87db-a9e071d81ec1",
+          "file": "c809be4f-829e-46d8-87db-a9e071d81ec1.jpg",
+          "caption": "嗯哼和CZ",
+          "createdAt": "2026-10-28T13:34:34.320Z"
+        },
+        {
+          "id": "57af11f3-61a6-40e0-b222-34966dc69100",
+          "file": "57af11f3-61a6-40e0-b222-34966dc69100.jpg",
+          "caption": "嗯哼和CZ",
+          "createdAt": "2026-10-28T13:34:44.155Z"
+        },
+        {
+          "id": "f0d6f8cc-3739-4516-b4b8-0c22ea3ff4f0",
+          "file": "f0d6f8cc-3739-4516-b4b8-0c22ea3ff4f0.jpg",
+          "caption": "嗯哼和CZ",
+          "createdAt": "2026-10-28T13:34:49.333Z"
+        },
+        {
+          "id": "4f092832-5dd1-42e0-9cc3-85110381de0e",
+          "file": "4f092832-5dd1-42e0-9cc3-85110381de0e.jpg",
+          "caption": "嗯哼和CZ",
+          "createdAt": "2026-10-28T14:00:42.459Z"
+        }
+      ]
     },
     {
       "id": "hotpot",
@@ -12,10 +139,28 @@
       "createdAt": "2026-10-25T00:00:01.000Z",
       "photos": [
         {
-          "id": "hotpot-close",
-          "file": "hotpot-close.jpg",
-          "caption": "2026年7月，成都火锅局落幕帖的封面",
-          "createdAt": "2026-07-14T08:24:00.000Z"
+          "id": "c09eb88a-491e-4e5d-a8ac-7f59f158af8b",
+          "file": "c09eb88a-491e-4e5d-a8ac-7f59f158af8b.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:09:59.977Z"
+        },
+        {
+          "id": "69cd52de-20c6-43fd-8747-5ac733e4da45",
+          "file": "69cd52de-20c6-43fd-8747-5ac733e4da45.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:10:00.006Z"
+        },
+        {
+          "id": "bf0123cd-bb33-49f6-bf12-284b1b94f355",
+          "file": "bf0123cd-bb33-49f6-bf12-284b1b94f355.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:10:00.044Z"
+        },
+        {
+          "id": "789f130b-45c8-4693-a9cf-a23330196445",
+          "file": "789f130b-45c8-4693-a9cf-a23330196445.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:10:00.082Z"
         }
       ]
     },
@@ -23,13 +168,244 @@
       "id": "meetup",
       "name": "嗯哼见面会",
       "createdAt": "2026-10-25T00:00:02.000Z",
-      "photos": []
+      "photos": [
+        {
+          "id": "5aa61e75-2f11-4b08-94cc-bf5a724eff80",
+          "file": "5aa61e75-2f11-4b08-94cc-bf5a724eff80.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:42.534Z"
+        },
+        {
+          "id": "ec4ee568-78fd-44bb-b1e1-dc1cf0a846b5",
+          "file": "ec4ee568-78fd-44bb-b1e1-dc1cf0a846b5.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:42.552Z"
+        },
+        {
+          "id": "dff2678f-e9b6-4610-8b5c-6d8d3ac5431c",
+          "file": "dff2678f-e9b6-4610-8b5c-6d8d3ac5431c.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:42.566Z"
+        },
+        {
+          "id": "c7fc3837-52b8-4e12-8d32-d42562e193cf",
+          "file": "c7fc3837-52b8-4e12-8d32-d42562e193cf.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:42.583Z"
+        },
+        {
+          "id": "38e1fb15-06e5-40f4-acdf-afda776ac671",
+          "file": "38e1fb15-06e5-40f4-acdf-afda776ac671.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:42.747Z"
+        },
+        {
+          "id": "dce59e61-5e16-4d5e-8309-973a17caddf2",
+          "file": "dce59e61-5e16-4d5e-8309-973a17caddf2.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:42.888Z"
+        },
+        {
+          "id": "69653e2f-cab3-49c0-96af-877fc63b0125",
+          "file": "69653e2f-cab3-49c0-96af-877fc63b0125.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:42.923Z"
+        },
+        {
+          "id": "a9b4bdc6-ea0c-44b6-a0fd-1a26bd294c75",
+          "file": "a9b4bdc6-ea0c-44b6-a0fd-1a26bd294c75.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:42.953Z"
+        },
+        {
+          "id": "0f153da1-9d6e-47ac-ab84-d3fb6e791a75",
+          "file": "0f153da1-9d6e-47ac-ab84-d3fb6e791a75.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:42.979Z"
+        },
+        {
+          "id": "10b0e6cf-1f0d-4122-83da-8c67b54e4564",
+          "file": "10b0e6cf-1f0d-4122-83da-8c67b54e4564.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:11:43.006Z"
+        }
+      ]
     },
     {
       "id": "other",
       "name": "其他",
       "createdAt": "2026-10-25T00:00:03.000Z",
-      "photos": []
+      "photos": [
+        {
+          "id": "fcd1ac81-a451-430d-90a5-7ad606330a95",
+          "file": "fcd1ac81-a451-430d-90a5-7ad606330a95.jpg",
+          "caption": "50万康帝红酒",
+          "createdAt": "2026-10-28T14:14:31.022Z"
+        },
+        {
+          "id": "c00f34e6-bf32-4fcd-819c-578dd6361d20",
+          "file": "c00f34e6-bf32-4fcd-819c-578dd6361d20.jpg",
+          "caption": "健身后嗯哼",
+          "createdAt": "2026-10-28T14:14:31.631Z"
+        },
+        {
+          "id": "21736a0e-5fff-48de-bdd3-d3c169ae1fe3",
+          "file": "21736a0e-5fff-48de-bdd3-d3c169ae1fe3.jpg",
+          "caption": "健身前的嗯哼",
+          "createdAt": "2026-10-28T14:14:31.415Z"
+        },
+        {
+          "id": "10eb9a0e-4e10-464d-b818-2c3e001887ec",
+          "file": "10eb9a0e-4e10-464d-b818-2c3e001887ec.jpg",
+          "caption": "嗯哼的手表",
+          "createdAt": "2026-10-28T14:14:31.616Z"
+        },
+        {
+          "id": "5779d270-4f20-42ee-bcbb-db86e32fac74",
+          "file": "5779d270-4f20-42ee-bcbb-db86e32fac74.jpg",
+          "caption": "嗯哼黄毛薄肌",
+          "createdAt": "2026-10-28T14:14:30.725Z"
+        },
+        {
+          "id": "bde3546d-e91c-4db5-b520-e036e4e0c848",
+          "file": "bde3546d-e91c-4db5-b520-e036e4e0c848.png",
+          "caption": "嗯哼人生",
+          "createdAt": "2026-10-28T14:14:30.790Z"
+        },
+        {
+          "id": "152d5032-fa49-4ef3-82ee-cb43300784b0",
+          "file": "152d5032-fa49-4ef3-82ee-cb43300784b0.png",
+          "caption": "嗯哼椰子鸡",
+          "createdAt": "2026-10-28T14:14:31.371Z"
+        },
+        {
+          "id": "19403001-6760-443b-bd33-afce553f2e59",
+          "file": "19403001-6760-443b-bd33-afce553f2e59.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:14:30.812Z"
+        },
+        {
+          "id": "0554e61b-28d7-48ba-af5d-3df54da1b81f",
+          "file": "0554e61b-28d7-48ba-af5d-3df54da1b81f.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:14:31.135Z"
+        },
+        {
+          "id": "2867d99e-d0f2-4c3e-90b7-95a83e8ddc69",
+          "file": "2867d99e-d0f2-4c3e-90b7-95a83e8ddc69.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:14:31.395Z"
+        },
+        {
+          "id": "91c621e4-d522-4434-98e4-348ef49cd9fa",
+          "file": "91c621e4-d522-4434-98e4-348ef49cd9fa.png",
+          "caption": "",
+          "createdAt": "2026-10-28T14:14:31.459Z"
+        },
+        {
+          "id": "7b7c58ec-40b8-4bd0-918d-10ce9554508e",
+          "file": "7b7c58ec-40b8-4bd0-918d-10ce9554508e.png",
+          "caption": "",
+          "createdAt": "2026-10-28T14:14:31.494Z"
+        },
+        {
+          "id": "1f98576c-3556-49ab-814f-de358b293a10",
+          "file": "1f98576c-3556-49ab-814f-de358b293a10.png",
+          "caption": "",
+          "createdAt": "2026-10-28T14:14:31.524Z"
+        },
+        {
+          "id": "e84124ee-bd39-4379-b188-c793e690af49",
+          "file": "e84124ee-bd39-4379-b188-c793e690af49.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:14:31.551Z"
+        },
+        {
+          "id": "6d1c036b-8b17-4f0c-88e2-1e35a0fc8298",
+          "file": "6d1c036b-8b17-4f0c-88e2-1e35a0fc8298.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:14:31.692Z"
+        }
+      ]
+    },
+    {
+      "id": "4d245a1f-9158-40d2-b40d-f8f1dea1bcfb",
+      "name": "嗯哼生日会",
+      "createdAt": "2026-10-28T14:11:54.127Z",
+      "photos": [
+        {
+          "id": "65796923-0c64-44cf-ab73-fbe1b0c963e7",
+          "file": "65796923-0c64-44cf-ab73-fbe1b0c963e7.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.402Z"
+        },
+        {
+          "id": "195ee361-b74e-41d6-a8ad-cc9e0cc3c535",
+          "file": "195ee361-b74e-41d6-a8ad-cc9e0cc3c535.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.524Z"
+        },
+        {
+          "id": "eea46ebc-c508-4294-afab-e7089b342a47",
+          "file": "eea46ebc-c508-4294-afab-e7089b342a47.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.639Z"
+        },
+        {
+          "id": "2169149e-d4cc-4a5f-a141-fafa9a6df00f",
+          "file": "2169149e-d4cc-4a5f-a141-fafa9a6df00f.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.660Z"
+        },
+        {
+          "id": "47f75b98-6de3-47cf-bfc6-d3d17594c4d0",
+          "file": "47f75b98-6de3-47cf-bfc6-d3d17594c4d0.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.676Z"
+        },
+        {
+          "id": "145ccb7e-3172-4652-8444-eab448083dc3",
+          "file": "145ccb7e-3172-4652-8444-eab448083dc3.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.692Z"
+        },
+        {
+          "id": "2a625c06-c761-4b2c-8975-fdbfe7058b3a",
+          "file": "2a625c06-c761-4b2c-8975-fdbfe7058b3a.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.705Z"
+        },
+        {
+          "id": "25a1004f-efcc-478d-9b27-71edc551a0a6",
+          "file": "25a1004f-efcc-478d-9b27-71edc551a0a6.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.720Z"
+        },
+        {
+          "id": "8a379978-4835-46f1-af3a-a8fb89c88393",
+          "file": "8a379978-4835-46f1-af3a-a8fb89c88393.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.736Z"
+        },
+        {
+          "id": "9cf3d5ec-812d-4b2a-b155-aad509f0a93b",
+          "file": "9cf3d5ec-812d-4b2a-b155-aad509f0a93b.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:40.903Z"
+        },
+        {
+          "id": "1dfbbb30-b101-4fb7-ba24-020b31623e11",
+          "file": "1dfbbb30-b101-4fb7-ba24-020b31623e11.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:41.095Z"
+        },
+        {
+          "id": "6f344115-ddd5-4544-8cce-28c068a01402",
+          "file": "6f344115-ddd5-4544-8cce-28c068a01402.jpg",
+          "caption": "",
+          "createdAt": "2026-10-28T14:12:41.132Z"
+        }
+      ]
     }
   ]
 }

@@ -1,6 +1,8 @@
-import { ImagePlus, Moon, Pencil, Sun, Trash2, X } from 'lucide-react'
+import { ArrowLeft, ImagePlus, Moon, Pencil, Sun, Trash2, X } from 'lucide-react'
 import { FormEvent, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { NavLink, useLocation } from 'react-router-dom'
+import { sortAlbumPhotos } from '../lib/albumOrder'
 import type { Album, AlbumPhoto } from '../lib/albumTypes'
 import { albumsUrl, albumFileSrc, imageSrc } from '../lib/format'
 import { ENHENG_AVATAR } from '../lib/profile'
@@ -20,7 +22,7 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
   const { authed } = useAdminSession()
   const editing = authed && location.pathname === '/admin'
   const [albums, setAlbums] = useState<Album[] | null>(null)
-  const [selectedId, setSelectedId] = useState('')
+  const [openedId, setOpenedId] = useState('')
   const [message, setMessage] = useState('')
   const [viewer, setViewer] = useState<AlbumPhoto | null>(null)
   const [draft, setDraft] = useState('')
@@ -36,10 +38,7 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
         if (cancelled) return
         const next = list.albums || []
         setAlbums(next)
-        setSelectedId((current) => {
-          if (current && next.some((album) => album.id === current)) return current
-          return next.find((album) => album.photos.length > 0)?.id || next[0]?.id || ''
-        })
+        setOpenedId((current) => (current && next.some((album) => album.id === current) ? current : ''))
       })
       .catch(() => {
         if (!cancelled) setMessage('相册没有加载出来')
@@ -49,12 +48,38 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
     }
   }, [location.pathname])
 
-  const selected = albums?.find((album) => album.id === selectedId) ?? null
+  const selected = albums?.find((album) => album.id === openedId) ?? null
+  const photos = selected ? sortAlbumPhotos(selected.photos) : []
 
   function apply(next: Album[]) {
     setAlbums(next)
-    setSelectedId((current) => (next.some((album) => album.id === current) ? current : next[0]?.id || ''))
+    setOpenedId((current) => (next.some((album) => album.id === current) ? current : ''))
   }
+
+  function closeAlbum() {
+    setOpenedId('')
+    setViewer(null)
+    setRenaming('')
+  }
+
+  function stepPhoto(delta: number) {
+    if (!viewer || photos.length < 2) return
+    const index = photos.findIndex((photo) => photo.id === viewer.id)
+    if (index < 0) return
+    const count = photos.length
+    setViewer(photos[(index + delta + count) % count])
+  }
+
+  useEffect(() => {
+    if (!viewer) return
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') setViewer(null)
+      if (event.key === 'ArrowRight') stepPhoto(1)
+      if (event.key === 'ArrowLeft') stepPhoto(-1)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [viewer, selected])
 
   async function createAlbum(event: FormEvent) {
     event.preventDefault()
@@ -74,7 +99,7 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
     setDraft('')
     apply(data.albums)
     const created = data.albums[data.albums.length - 1]
-    if (created) setSelectedId(created.id)
+    if (created) setOpenedId(created.id)
   }
 
   async function saveName(event: FormEvent) {
@@ -109,12 +134,15 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
     apply(data.albums)
   }
 
-  async function upload(files: FileList | null) {
-    if (!files || !selected) return
+  async function upload(list: File[]) {
+    if (list.length === 0 || !selected) return
     setBusy(true)
-    setMessage('')
+    setMessage(list.length > 1 ? `正在上传 ${list.length} 张…` : '')
     let latest: Album[] | null = null
-    for (const file of files) {
+    let saved = 0
+    let failed = 0
+    let reason = ''
+    for (const file of list) {
       const dataUrl = await readFile(file)
       const response = await fetch(`/api/admin/albums/${selected.id}/photos`, {
         method: 'POST',
@@ -123,13 +151,22 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
       })
       const data = (await response.json().catch(() => ({}))) as { error?: string; albums?: Album[] }
       if (!response.ok || !data.albums) {
-        setMessage(data.error || '这张图没有传上去')
-        break
+        failed += 1
+        reason = data.error || '这张图没有传上去'
+        continue
       }
+      saved += 1
       latest = data.albums
     }
     if (latest) apply(latest)
     setBusy(false)
+    if (list.length > 1) {
+      setMessage(failed ? `上传了 ${saved} 张，${failed} 张没有传上。${reason}` : `上传了 ${saved} 张`)
+    } else if (failed) {
+      setMessage(reason || '这张图没有传上去')
+    } else {
+      setMessage('')
+    }
   }
 
   async function saveCaption(photo: AlbumPhoto, caption: string) {
@@ -157,6 +194,7 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
       return
     }
     apply(data.albums)
+    setViewer((current) => (current?.id === photo.id ? null : current))
   }
 
   return (
@@ -182,19 +220,13 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
           </button>
         </form>
       ) : null}
-      <ul className="album-list">
-        {(albums || []).map((album) => (
-          <li key={album.id}>
-            <button type="button" className={album.id === selectedId ? 'on' : ''} onClick={() => setSelectedId(album.id)}>
-              <span>{album.name}</span>
-              <small>{album.photos.length}</small>
-            </button>
-          </li>
-        ))}
-      </ul>
       {selected ? (
         <section className="album-view">
           <div className="album-view-head">
+            <button type="button" className="album-back" onClick={closeAlbum}>
+              <ArrowLeft size={16} />
+              相册
+            </button>
             {editing && renaming === selected.id ? (
               <form onSubmit={saveName}>
                 <input value={renameValue} onChange={(event) => setRenameValue(event.target.value)} maxLength={40} />
@@ -220,29 +252,29 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
                 <button type="button" aria-label="删除相册" onClick={removeAlbum}>
                   <Trash2 size={16} />
                 </button>
-                <label className={busy ? 'off' : ''}>
+                <label className={busy ? 'off' : ''} title="上传照片" aria-label="上传照片">
                   <ImagePlus size={16} />
-                  上传
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
                     multiple
                     disabled={busy}
                     onChange={(event) => {
-                      void upload(event.target.files)
+                      const picked = Array.from(event.target.files || [])
                       event.target.value = ''
+                      void upload(picked)
                     }}
                   />
                 </label>
               </span>
             ) : null}
           </div>
-          {selected.photos.length === 0 ? <p className="album-empty">这个相册还没有照片。</p> : null}
+          {photos.length === 0 ? <p className="album-empty">这个相册还没有照片。</p> : null}
           <div className="photo-grid">
-            {selected.photos.map((photo) => (
+            {photos.map((photo) => (
               <figure key={photo.id}>
-                <button type="button" onClick={() => setViewer(photo)}>
-                  <img src={albumFileSrc(photo.file)} alt={photo.caption || selected.name} />
+                <button type="button" onClick={() => setViewer(photo)} aria-label={photo.caption || '查看原图'}>
+                  <img src={albumFileSrc(photo.file)} alt="" />
                 </button>
                 {editing ? (
                   <input
@@ -251,11 +283,17 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
                     maxLength={80}
                     onBlur={(event) => void saveCaption(photo, event.target.value)}
                   />
-                ) : photo.caption ? (
-                  <figcaption>{photo.caption}</figcaption>
                 ) : null}
                 {editing ? (
-                  <button type="button" className="photo-delete" aria-label="删除照片" onClick={() => void removePhoto(photo)}>
+                  <button
+                    type="button"
+                    className="photo-delete"
+                    aria-label="删除照片"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      void removePhoto(photo)
+                    }}
+                  >
                     <X size={14} />
                   </button>
                 ) : null}
@@ -263,19 +301,53 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
             ))}
           </div>
         </section>
-      ) : null}
-      {message ? <p className="album-message">{message}</p> : null}
-      {viewer ? (
-        <dialog className="lightbox" open onClick={() => setViewer(null)}>
-          <figure onClick={(event) => event.stopPropagation()}>
-            <img src={albumFileSrc(viewer.file)} alt={viewer.caption || ''} />
-            {viewer.caption ? <figcaption>{viewer.caption}</figcaption> : null}
-            <button type="button" onClick={() => setViewer(null)} aria-label="关闭">
-              <X size={18} />
-            </button>
-          </figure>
-        </dialog>
-      ) : null}
+      ) : (
+        <ul className="album-list">
+          {(albums || []).map((album) => (
+            <li key={album.id}>
+              <button type="button" onClick={() => setOpenedId(album.id)}>
+                <span>{album.name}</span>
+                <small>{album.photos.length}</small>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {message ? <p className={message.startsWith('上传了') && !message.includes('没有') ? 'album-message ok' : 'album-message'}>{message}</p> : null}
+      {viewer
+        ? createPortal(
+            <div className="lightbox" role="dialog" aria-modal="true" aria-label="原图" onClick={() => setViewer(null)}>
+              <div className="lightbox-stage" onClick={(event) => event.stopPropagation()}>
+                <img src={albumFileSrc(viewer.file)} alt={viewer.caption || selected?.name || ''} />
+              </div>
+              {viewer.caption ? <p className="lightbox-caption">{viewer.caption}</p> : null}
+              <div className="lightbox-bar" onClick={(event) => event.stopPropagation()}>
+                {photos.length > 1 ? (
+                  <>
+                    <button type="button" onClick={() => stepPhoto(-1)}>
+                      上一张
+                    </button>
+                    <button type="button" onClick={() => stepPhoto(1)}>
+                      下一张
+                    </button>
+                  </>
+                ) : null}
+                <button type="button" onClick={() => setViewer(null)}>
+                  退出
+                </button>
+                <button type="button" onClick={closeAlbum}>
+                  其他相册
+                </button>
+                {editing ? (
+                  <button type="button" className="lightbox-delete" onClick={() => void removePhoto(viewer)}>
+                    删除这张
+                  </button>
+                ) : null}
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </header>
   )
 }

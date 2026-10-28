@@ -405,6 +405,29 @@ button { display: inline-flex; align-items: center; gap: 6px; }
 
 .album-create button:disabled { opacity: 0.5; cursor: default; }
 
+.album-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 0;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.album-view-head .album-back {
+  flex: none;
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  white-space: nowrap;
+}
+
 .album-list {
   list-style: none;
   margin: 0;
@@ -435,26 +458,46 @@ button { display: inline-flex; align-items: center; gap: 6px; }
 .album-view-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   margin-bottom: 8px;
+  min-width: 0;
 }
 
-.album-view-head strong { font-size: 15px; }
-.album-view-head form { margin: 0; flex: 1; }
+.album-view-head strong {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.album-view-head form { margin: 0; flex: 1; min-width: 0; }
 
-.album-view-actions { display: flex; gap: 6px; align-items: center; }
+.album-view-actions { display: flex; gap: 6px; align-items: center; flex: none; }
 .album-view-actions button,
 .album-view-actions label {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  flex: none;
+  justify-content: center;
   background: transparent;
   color: var(--text);
   border: 1px solid var(--border);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  white-space: nowrap;
 }
+.album-view-actions label { position: relative; overflow: hidden; }
 .album-view-actions label.off { opacity: 0.5; pointer-events: none; }
-.album-view-actions input { display: none; }
+.album-view-actions input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px;
+}
 
 .album-empty, .album-message {
   margin: 0 0 8px;
@@ -462,6 +505,7 @@ button { display: inline-flex; align-items: center; gap: 6px; }
   font-size: 13px;
 }
 .album-message { color: var(--danger); padding: 0 12px; }
+.album-message.ok { color: var(--secondary); }
 
 .admin-albums {
   padding: 4px 16px 8px;
@@ -479,7 +523,7 @@ button { display: inline-flex; align-items: center; gap: 6px; }
 }
 
 .photo-grid figure { margin: 0; position: relative; }
-.photo-grid figure > button {
+.photo-grid figure > button:not(.photo-delete) {
   display: block;
   width: 100%;
   padding: 0;
@@ -507,11 +551,12 @@ button { display: inline-flex; align-items: center; gap: 6px; }
   position: absolute;
   top: 6px;
   right: 6px;
-  width: 24px;
-  height: 24px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
   border: 0;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.72);
   color: white;
   display: grid;
   place-items: center;
@@ -519,38 +564,59 @@ button { display: inline-flex; align-items: center; gap: 6px; }
   padding: 0;
 }
 
-dialog.lightbox[open] {
+.lightbox {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
+  z-index: 40;
   margin: 0;
   border: 0;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.82);
-  display: grid;
-  place-items: center;
-  z-index: 20;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(0, 0, 0, 0.94);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
-.lightbox figure { margin: 0; position: relative; max-width: min(960px, 100%); }
-.lightbox img { max-width: 100%; max-height: 80vh; display: block; border-radius: 16px; }
-.lightbox figcaption { color: white; margin-top: 8px; }
-.lightbox figure > button {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 36px;
-  height: 36px;
+.lightbox-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox img {
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.lightbox-caption {
+  margin: 8px 0 0;
+  color: white;
+  text-align: center;
+  font-size: 14px;
+}
+.lightbox-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 12px;
+}
+.lightbox-bar button {
   border: 0;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.65);
-  color: white;
+  background: #fff;
+  color: #111;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  display: grid;
-  place-items: center;
 }
+.lightbox-delete { background: #fff; }
 
 .column {
   width: 600px;
@@ -844,15 +910,12 @@ dialog.lightbox[open] {
 
 .tweet-head a { color: inherit; text-decoration: none; }
 .tweet-head > a:first-child {
-  flex: 0 0 auto;
+  flex: none;
   min-width: 0;
-  max-width: calc(100% - 132px);
-  overflow: hidden;
+  overflow: visible;
 }
 .tweet-head strong {
   display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 700;
 }
@@ -860,6 +923,7 @@ dialog.lightbox[open] {
 .tweet-head .dot,
 .tweet-head .time { flex: none; }
 .tweet-head .handle { flex: 0 1 auto; min-width: 0; }
+.tweet-head .time { overflow: visible; text-overflow: clip; }
 .handle, .time, .dot { color: var(--secondary); }
 .handle, .time { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tweet-head a:hover strong,
