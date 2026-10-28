@@ -27,6 +27,7 @@ export function AdminPage() {
   const [featureOne, setFeatureOne] = useState(false)
   const [featureBatch, setFeatureBatch] = useState(false)
   const [query, setQuery] = useState('')
+  const [publishing, setPublishing] = useState(false)
   const visible = tweets.filter((tweet) => matchesTweet(tweet, query))
 
   async function loadTweets() {
@@ -150,6 +151,50 @@ export function AdminPage() {
     await loadTweets()
   }
 
+  async function setCategory(tweet: StoredTweet, category: string) {
+    if (tweet.categories[0] === category) return
+    const response = await fetch(`/api/admin/tweets/${tweet.id}/category`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ category }),
+    })
+    const data = (await response.json()) as { error?: string }
+    if (!response.ok) {
+      setMessage(data.error || '分类没有改')
+      return
+    }
+    setMessage('已改分类')
+    await loadTweets()
+  }
+
+  async function movePick(tweet: StoredTweet, direction: 'up' | 'down') {
+    const response = await fetch(`/api/admin/tweets/${tweet.id}/pick`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ direction }),
+    })
+    const data = (await response.json()) as { error?: string }
+    if (!response.ok) {
+      setMessage(data.error || '没有移动')
+      return
+    }
+    setMessage(direction === 'up' ? '已在精选里上移' : '已在精选里下移')
+    await loadTweets()
+  }
+
+  async function publishSite() {
+    setPublishing(true)
+    setMessage('正在同步到公开网站，需要一两分钟')
+    const response = await fetch('/api/admin/publish', { method: 'POST' })
+    const data = (await response.json()) as { error?: string; url?: string }
+    setPublishing(false)
+    if (!response.ok) {
+      setMessage(data.error || '同步没有完成')
+      return
+    }
+    setMessage(data.url ? `已同步到 ${data.url}` : '已同步')
+  }
+
   async function logout() {
     await fetch('/api/admin/logout', { method: 'POST' })
     setAuthed(false)
@@ -180,13 +225,16 @@ export function AdminPage() {
       {authed ? (
         <>
           <form className="admin-form" onSubmit={(event) => event.preventDefault()}>
-            <label htmlFor="tweet-find">已收录 {tweets.length} 条，可删除其中某一条</label>
+            <label htmlFor="tweet-find">已收录 {tweets.length} 条，一条只属于一个分类</label>
             <input
               id="tweet-find"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="搜索文字，或贴要删除的帖子链接"
             />
+            <button type="button" onClick={() => void publishSite()} disabled={publishing}>
+              {publishing ? '正在同步…' : '同步到公开网站'}
+            </button>
           </form>
           {query.trim() && visible.length === 0 ? <p className="status">没有找到这条收录</p> : null}
           <ul className="admin-list">
@@ -197,9 +245,31 @@ export function AdminPage() {
                   <p>{tweet.text}</p>
                 </div>
                 <div className="admin-item-actions">
+                  <select
+                    className="admin-category"
+                    aria-label="分类"
+                    value={tweet.categories[0] ?? 'other'}
+                    onChange={(event) => void setCategory(tweet, event.target.value)}
+                  >
+                    {CATEGORIES.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
                   <button type="button" className={tweet.featured ? 'picked' : 'ghost'} onClick={() => void toggleFeatured(tweet)}>
                     {tweet.featured ? '移出精选' : '放入精选'}
                   </button>
+                  {tweet.featured ? (
+                    <>
+                      <button type="button" className="ghost" onClick={() => void movePick(tweet, 'up')}>
+                        上移
+                      </button>
+                      <button type="button" className="ghost" onClick={() => void movePick(tweet, 'down')}>
+                        下移
+                      </button>
+                    </>
+                  ) : null}
                   <button type="button" className="danger" onClick={() => remove(tweet)}>
                     <Trash2 size={16} strokeWidth={1.75} />
                     删除

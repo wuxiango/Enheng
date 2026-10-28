@@ -1,14 +1,28 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { TweetCard } from '../components/TweetCard'
 import { TopicGlyph } from '../components/topicIcons'
 import { CATEGORIES } from '../lib/classify'
 import { featuredTweets, uniqueTweets } from '../lib/tweets'
+import type { StoredTweet } from '../lib/types'
 import { useTimeline } from './useTimeline'
 import { useTweets } from './useTweets'
 
+function matchesQuery(tweet: StoredTweet, query: string) {
+  const raw = query.trim()
+  if (!raw) return false
+  const id = raw.match(/status\/(\d+)/)?.[1]
+  if (id) return tweet.id === id
+  const needle = raw.toLowerCase()
+  return tweet.text.toLowerCase().includes(needle) || tweet.id.includes(raw)
+}
+
 export function HomePage() {
   const { tweets, error } = useTweets()
+  const [query, setQuery] = useState('')
   const archive = tweets ? uniqueTweets(tweets) : null
   const picks = archive ? featuredTweets(archive) : null
+  const found = archive && query.trim() ? archive.filter((tweet) => matchesQuery(tweet, query)) : null
   const timeline = useTimeline()
   const newest = timeline.tweets?.[0]
   const latestText = timeline.error
@@ -22,7 +36,24 @@ export function HomePage() {
   return (
     <>
       <div className="topbar">主题</div>
+      <form className="home-search" onSubmit={(event) => event.preventDefault()}>
+        <label className="sr" htmlFor="home-find">搜索收录</label>
+        <input
+          id="home-find"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="搜索收录的帖子"
+        />
+      </form>
       {error ? <p className="status">{error}</p> : null}
+      {found ? (
+        <>
+          <p className="status">{found.length > 0 ? `找到 ${found.length} 条` : '没有找到这条收录'}</p>
+          {found.map((tweet) => (
+            <TweetCard key={tweet.id} tweet={tweet} />
+          ))}
+        </>
+      ) : (
       <div>
         <Link to="/topic/latest" className="topic-row">
           <span className="topic-mark">
@@ -68,6 +99,7 @@ export function HomePage() {
             })
           : null}
       </div>
+      )}
     </>
   )
 }

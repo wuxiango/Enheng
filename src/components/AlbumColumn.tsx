@@ -25,6 +25,7 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
   const [openedId, setOpenedId] = useState('')
   const [message, setMessage] = useState('')
   const [viewer, setViewer] = useState<AlbumPhoto | null>(null)
+  const [batchName, setBatchName] = useState('')
   const [draft, setDraft] = useState('')
   const [renaming, setRenaming] = useState('')
   const [renameValue, setRenameValue] = useState('')
@@ -166,7 +167,7 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
       const response = await fetch(`/api/admin/albums/${selected.id}/photos`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ dataUrl }),
+        body: JSON.stringify({ dataUrl, caption: batchName.trim() }),
       })
       const data = (await response.json().catch(() => ({}))) as { error?: string; albums?: Album[] }
       if (!response.ok || !data.albums) {
@@ -288,6 +289,15 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
               </span>
             ) : null}
           </div>
+          {editing ? (
+            <input
+              className="album-batch-name"
+              value={batchName}
+              onChange={(event) => setBatchName(event.target.value)}
+              placeholder="这批照片的名字，可不填"
+              maxLength={40}
+            />
+          ) : null}
           {photos.length === 0 ? <p className="album-empty">这个相册还没有照片。</p> : null}
           <div className="photo-grid">
             {photos.map((photo) => (

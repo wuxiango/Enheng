@@ -29,6 +29,17 @@ function mentions(text: string, word: string): boolean {
 
 export function classifyTweet(text: string): CategoryId[] {
   const haystack = text.toLowerCase()
-  const hits = RULES.filter((rule) => rule.words.some((word) => mentions(haystack, word))).map((rule) => rule.id)
-  return hits.length > 0 ? hits : ['other']
+  let bestId: CategoryId = 'other'
+  let bestScore = 0
+  for (const rule of RULES) {
+    let score = 0
+    for (const word of rule.words) {
+      if (mentions(haystack, word)) score += 1
+    }
+    if (score > bestScore) {
+      bestScore = score
+      bestId = rule.id
+    }
+  }
+  return [bestId]
 }

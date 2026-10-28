@@ -35,17 +35,17 @@ describe('classifyTweet', () => {
   })
 
   it('把身体和现场放进生活', () => {
-    expect(classifyTweet('我的网球教练说选择大于努力')).toEqual(['life', 'views'])
+    expect(classifyTweet('我的网球教练说选择大于努力')).toEqual(['life'])
   })
 
   it('把成长和学习放进观点', () => {
     expect(classifyTweet('回头看，那几年让我飞快成长，人生的第一笔本金就在那里')).toEqual(['views'])
   })
 
-  it('一条帖子可以同时属于多个主题', () => {
+  it('一条帖子只放进得分最高的分类', () => {
     expect(
       classifyTweet('和 Ai 对话了很久，人类最大单一企业的市值上限大概不会超过美债的一半'),
-    ).toEqual(['ai', 'market'])
+    ).toEqual(['market'])
   })
 
   it('把稳定币放进行情', () => {

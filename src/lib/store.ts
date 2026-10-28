@@ -1,6 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
-import type { StoredTweet } from './types'
+import type { CategoryId, StoredTweet } from './types'
+import { featuredTweets } from './tweets'
+
+const CATEGORY_IDS: CategoryId[] = ['market', 'views', 'people', 'ai', 'life', 'other']
 
 export type { StoredTweet } from './types'
 
@@ -42,7 +45,35 @@ export function createStore(file: string) {
       const tweet = tweets.find((item) => item.id === id)
       if (!tweet) return false
       if (featured) tweet.featured = true
-      else delete tweet.featured
+      else {
+        delete tweet.featured
+        delete tweet.pickOrder
+      }
+      write(tweets)
+      return true
+    },
+    setCategory(id: string, category: string): boolean {
+      if (!CATEGORY_IDS.includes(category as CategoryId)) return false
+      const tweets = read()
+      const tweet = tweets.find((item) => item.id === id)
+      if (!tweet) return false
+      tweet.categories = [category as CategoryId]
+      write(tweets)
+      return true
+    },
+    moveFeatured(id: string, direction: 'up' | 'down'): boolean {
+      const ordered = featuredTweets(read())
+      const index = ordered.findIndex((item) => item.id === id)
+      const nextIndex = direction === 'up' ? index - 1 : index + 1
+      if (index < 0 || nextIndex < 0 || nextIndex >= ordered.length) return false
+      const next = ordered.slice()
+      const [item] = next.splice(index, 1)
+      next.splice(nextIndex, 0, item)
+      const tweets = read()
+      for (const [order, picked] of next.entries()) {
+        const found = tweets.find((tweet) => tweet.id === picked.id)
+        if (found) found.pickOrder = order
+      }
       write(tweets)
       return true
     },

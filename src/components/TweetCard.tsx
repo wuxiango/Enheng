@@ -272,6 +272,7 @@ export function TweetCard({ tweet, layout = 'feed' }: { tweet: StoredTweet; layo
   const [longBusy, setLongBusy] = useState(false)
   const [framing, setFraming] = useState(false)
   const [sheet, setSheet] = useState<ShotItem[] | null>(null)
+  const [copied, setCopied] = useState(false)
   const names = CATEGORIES.filter((item) => tweet.categories.includes(item.id))
   const stamp = formatStatusStamp(tweet.createdAt)
 
@@ -425,16 +426,36 @@ export function TweetCard({ tweet, layout = 'feed' }: { tweet: StoredTweet; layo
     }
   }
 
-  const topics =
-    names.length > 0 ? (
-      <div className="topics">
-        {names.map((item) => (
-          <Link key={item.id} to={`/topic/${item.id}`}>
-            #{item.name}
-          </Link>
-        ))}
-      </div>
-    ) : null
+  async function copyLink(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+    const href = `${window.location.origin}${import.meta.env.BASE_URL}status/${tweet.id}`
+    try {
+      await navigator.clipboard.writeText(href)
+    } catch {
+      const input = document.createElement('textarea')
+      input.value = href
+      document.body.appendChild(input)
+      input.select()
+      document.execCommand('copy')
+      input.remove()
+    }
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1600)
+  }
+
+  const topics = (
+    <div className="topics">
+      {names.map((item) => (
+        <Link key={item.id} to={`/topic/${item.id}`}>
+          #{item.name}
+        </Link>
+      ))}
+      <button type="button" className="copy-link no-shot" onClick={(event) => void copyLink(event)}>
+        {copied ? '已复制' : '复制链接'}
+      </button>
+    </div>
+  )
 
   const actions = (
     <div className="actions">

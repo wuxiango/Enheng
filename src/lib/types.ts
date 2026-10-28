@@ -34,5 +34,6 @@ export type StoredTweet = {
   }
   categories: CategoryId[]
   featured?: boolean
+  pickOrder?: number
   repostedBy?: { name: string; handle: string } | null
 }

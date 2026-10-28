@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
+import { spawn } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import express from 'express'
@@ -191,6 +192,74 @@ app.post('/api/admin/tweets/:id/featured', (req, res) => {
     return
   }
   res.json({ ok: true, featured })
+})
+
+app.post('/api/admin/tweets/:id/category', (req, res) => {
+  if (!isAdmin(req.headers.cookie)) {
+    res.status(401).json({ error: '需要管理员登录' })
+    return
+  }
+  const updated = store.setCategory(req.params.id, String(req.body?.category || ''))
+  if (!updated) {
+    res.status(404).json({ error: '没有这条帖子' })
+    return
+  }
+  res.json({ ok: true })
+})
+
+app.post('/api/admin/tweets/:id/pick', (req, res) => {
+  if (!isAdmin(req.headers.cookie)) {
+    res.status(401).json({ error: '需要管理员登录' })
+    return
+  }
+  const direction = req.body?.direction === 'down' ? 'down' : 'up'
+  const updated = store.moveFeatured(req.params.id, direction)
+  if (!updated) {
+    res.status(404).json({ error: '这条不能移动' })
+    return
+  }
+  res.json({ ok: true })
+})
+
+let publishing = false
+
+app.post('/api/admin/publish', (req, res) => {
+  if (!isAdmin(req.headers.cookie)) {
+    res.status(401).json({ error: '需要管理员登录' })
+    return
+  }
+  if (publishing) {
+    res.status(409).json({ error: '正在同步，请稍等' })
+    return
+  }
+  publishing = true
+  const child = spawn('npm run build:pages && node scripts/publish-github.mjs', {
+    cwd: root,
+    shell: true,
+    env: { ...process.env, PUBLISH_MESSAGE: 'Publish the current local site.' },
+    windowsHide: true,
+  })
+  let output = ''
+  child.stdout.on('data', (chunk) => {
+    output += String(chunk)
+  })
+  child.stderr.on('data', (chunk) => {
+    output += String(chunk)
+  })
+  child.on('error', () => {
+    publishing = false
+    if (!res.headersSent) res.status(500).json({ error: '同步没有开始' })
+  })
+  child.on('close', (code) => {
+    publishing = false
+    if (res.headersSent) return
+    if (code === 0) {
+      res.json({ ok: true, url: 'https://wuxiango.github.io/Enheng/' })
+      return
+    }
+    res.status(500).json({ error: '同步没有完成' })
+    console.error(output.slice(-800))
+  })
 })
 
 app.delete('/api/admin/tweets/:id', (req, res) => {
