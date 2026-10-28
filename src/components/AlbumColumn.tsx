@@ -1,5 +1,5 @@
 import { ArrowLeft, ImagePlus, Moon, Pencil, Sun, Trash2, X } from 'lucide-react'
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, TouchEvent, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { NavLink, useLocation } from 'react-router-dom'
 import { sortAlbumPhotos } from '../lib/albumOrder'
@@ -29,6 +29,8 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
   const [renaming, setRenaming] = useState('')
   const [renameValue, setRenameValue] = useState('')
   const [busy, setBusy] = useState(false)
+  const swipeStart = useRef<{ x: number; y: number } | null>(null)
+  const swiped = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -68,6 +70,23 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
     if (index < 0) return
     const count = photos.length
     setViewer(photos[(index + delta + count) % count])
+  }
+
+  function onSwipeStart(event: TouchEvent) {
+    if (event.touches.length !== 1) return
+    swipeStart.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }
+  }
+
+  function onSwipeEnd(event: TouchEvent) {
+    const start = swipeStart.current
+    swipeStart.current = null
+    const touch = event.changedTouches[0]
+    if (!start || !touch) return
+    const dx = touch.clientX - start.x
+    const dy = touch.clientY - start.y
+    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return
+    swiped.current = true
+    stepPhoto(dx < 0 ? 1 : -1)
   }
 
   useEffect(() => {
@@ -316,9 +335,23 @@ export function AlbumColumn({ dark, onToggleTheme }: { dark: boolean; onToggleTh
       {message ? <p className={message.startsWith('上传了') && !message.includes('没有') ? 'album-message ok' : 'album-message'}>{message}</p> : null}
       {viewer
         ? createPortal(
-            <div className="lightbox" role="dialog" aria-modal="true" aria-label="原图" onClick={() => setViewer(null)}>
+            <div
+              className="lightbox"
+              role="dialog"
+              aria-modal="true"
+              aria-label="原图"
+              onClick={() => {
+                if (swiped.current) {
+                  swiped.current = false
+                  return
+                }
+                setViewer(null)
+              }}
+              onTouchStart={onSwipeStart}
+              onTouchEnd={onSwipeEnd}
+            >
               <div className="lightbox-stage" onClick={(event) => event.stopPropagation()}>
-                <img src={albumFileSrc(viewer.file)} alt={viewer.caption || selected?.name || ''} />
+                <img src={albumFileSrc(viewer.file)} alt={viewer.caption || selected?.name || ''} draggable={false} />
               </div>
               {viewer.caption ? <p className="lightbox-caption">{viewer.caption}</p> : null}
               <div className="lightbox-bar" onClick={(event) => event.stopPropagation()}>
