@@ -28,6 +28,7 @@ export function AdminPage() {
   const [featureBatch, setFeatureBatch] = useState(false)
   const [query, setQuery] = useState('')
   const [publishing, setPublishing] = useState(false)
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   const visible = tweets.filter((tweet) => matchesTweet(tweet, query))
 
   async function loadTweets() {
@@ -41,20 +42,25 @@ export function AdminPage() {
     setBusy(true)
     setMessage('')
     setFailures([])
-    const response = await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ password }),
-    })
-    const data = (await response.json()) as { error?: string }
-    setBusy(false)
-    if (!response.ok) {
-      setMessage(data.error || '登录失败')
-      return
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+      const data = (await response.json()) as { error?: string }
+      if (!response.ok) {
+        setMessage(data.error || '登录失败')
+        return
+      }
+      setPassword('')
+      setAuthed(true)
+      await loadTweets()
+    } catch {
+      setMessage('登录没有完成，请再试一次')
+    } finally {
+      setBusy(false)
     }
-    setPassword('')
-    setAuthed(true)
-    await loadTweets()
   }
 
   async function addTweet(event: FormEvent) {
@@ -218,7 +224,7 @@ export function AdminPage() {
           />
           <button type="submit" disabled={busy}>
             <LogIn size={16} strokeWidth={1.75} />
-            登录
+            {busy ? '正在登录…' : '登录'}
           </button>
         </form>
       ) : null}
@@ -232,9 +238,11 @@ export function AdminPage() {
               onChange={(event) => setQuery(event.target.value)}
               placeholder="搜索文字，或贴要删除的帖子链接"
             />
-            <button type="button" onClick={() => void publishSite()} disabled={publishing}>
-              {publishing ? '正在同步…' : '同步到公开网站'}
-            </button>
+            {isLocal ? (
+              <button type="button" onClick={() => void publishSite()} disabled={publishing}>
+                {publishing ? '正在同步…' : '同步到公开网站'}
+              </button>
+            ) : null}
           </form>
           {query.trim() && visible.length === 0 ? <p className="status">没有找到这条收录</p> : null}
           <ul className="admin-list">
