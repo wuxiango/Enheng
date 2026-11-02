@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { handleApi } from '../cloudflare/api'
 import type { Env } from '../cloudflare/env'
 
@@ -55,7 +55,9 @@ describe.skipIf(nodeMajor < 22)('Cloudflare 版后台', () => {
     const proxy = await getPlatformProxy<Env>({ persist: { path: mkdtempSync(join(tmpdir(), 'enheng-cf-')) } })
     dispose = proxy.dispose
     env = { ...proxy.env, ADMIN_PASSWORD: PASSWORD, SESSION_SECRET: 'x'.repeat(40) } as Env
-    const schema = readFileSync(join(__dirname, '..', 'migrations', '0001_init.sql'), 'utf8')
+    const schema = ['0001_init.sql', '0002_login_attempts.sql']
+      .map((name) => readFileSync(join(__dirname, '..', 'migrations', name), 'utf8'))
+      .join(';\n')
       .replace(/--.*$/gm, '')
       .split(';')
       .map((statement) => statement.trim())
@@ -144,5 +146,48 @@ describe.skipIf(nodeMajor < 22)('Cloudflare 版后台', () => {
     await call('POST', '/api/admin/login', { password: PASSWORD })
     await call('POST', '/api/admin/logout')
     expect((await call('GET', '/api/admin/session')).data).toEqual({ ok: false })
+  })
+
+  async function loginFrom(handler: typeof handleApi, ip: string, password: string) {
+    const response = await handler(
+      new Request(`${BASE}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'cf-connecting-ip': ip },
+        body: JSON.stringify({ password }),
+      }),
+      env,
+    )
+    return { status: response.status, data: await response.json() }
+  }
+
+  async function freshHandler(): Promise<typeof handleApi> {
+    vi.resetModules()
+    return (await import('../cloudflare/api')).handleApi
+  }
+
+  it('失败 5 次后锁定，换一个后台实例也照样锁定，不存密码', async () => {
+    const first = await freshHandler()
+    for (let i = 0; i < 5; i += 1) expect((await loginFrom(first, '203.0.113.7', 'wrong')).status).toBe(401)
+    const second = await freshHandler()
+    expect(second).not.toBe(first)
+    const blocked = await loginFrom(second, '203.0.113.7', PASSWORD)
+    expect(blocked).toEqual({ status: 429, data: { error: '尝试次数太多，请稍后再试' } })
+    expect((await loginFrom(second, '203.0.113.8', PASSWORD)).status).toBe(200)
+    const rows = await env.DB.prepare('SELECT * FROM login_attempts').all()
+    expect(JSON.stringify(rows.results)).not.toContain('wrong')
+    expect(JSON.stringify(rows.results)).not.toContain(PASSWORD)
+  })
+
+  it('登录成功后失败次数清零，过期窗口会重新计数', async () => {
+    const first = await freshHandler()
+    for (let i = 0; i < 4; i += 1) await loginFrom(first, '198.51.100.9', 'wrong')
+    const second = await freshHandler()
+    expect((await loginFrom(second, '198.51.100.9', PASSWORD)).status).toBe(200)
+    expect(await env.DB.prepare('SELECT count FROM login_attempts WHERE key = ?').bind('198.51.100.9').first()).toBeNull()
+    for (let i = 0; i < 4; i += 1) expect((await loginFrom(first, '198.51.100.9', 'wrong')).status).toBe(401)
+    expect((await loginFrom(second, '198.51.100.9', PASSWORD)).status).toBe(200)
+
+    await env.DB.prepare('INSERT INTO login_attempts (key, count, reset_at) VALUES (?, 5, ?)').bind('192.0.2.1', Date.now() - 1).run()
+    expect((await loginFrom(second, '192.0.2.1', PASSWORD)).status).toBe(200)
   })
 })

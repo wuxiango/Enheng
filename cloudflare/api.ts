@@ -1,4 +1,3 @@
-import { createLoginGuard } from '../src/lib/loginGuard'
 import { decodeImageDataUrl } from '../src/lib/imageData'
 import { normalizeFxTweet } from '../src/lib/normalize'
 import { passwordsMatch } from '../src/lib/password'
@@ -6,6 +5,7 @@ import { signSession, verifySession } from '../src/lib/session'
 import type { StoredTweet } from '../src/lib/types'
 import { isCuratedAuthor, parseTweetBatch, parseTweetUrl } from '../src/lib/url'
 import { createAlbumStore, createTweetStore } from './db'
+import { createD1LoginGuard } from './loginAttempts'
 import type { Env } from './env'
 
 // 和原来 Express 后台 (server/app.ts + server/albumRoutes.ts) 一一对应的 Cloudflare 版本。
@@ -16,9 +16,6 @@ const SESSION_MAX_AGE = 60 * 60 * 12
 const SMALL_BODY = 32 * 1024
 const LARGE_BODY = 16 * 1024 * 1024
 const TYPES: Record<string, string> = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif' }
-
-// 每个 isolate 各自计数，和原来单进程内存计数的效果相近
-const loginGuard = createLoginGuard()
 
 class HttpError extends Error {
   constructor(public status: number, message: string) {
@@ -107,17 +104,19 @@ const routes: Route[] = [
   {
     method: 'POST',
     pattern: /^\/api\/admin\/login$/,
-    run: ({ request, env, url, body }) => {
+    run: async ({ request, env, url, body }) => {
+      // 失败次数记在 D1 (login_attempts)，所有实例共用
+      const loginGuard = createD1LoginGuard(env.DB)
       const key = request.headers.get('cf-connecting-ip') || 'unknown'
-      if (loginGuard.blocked(key)) return json({ error: '尝试次数太多，请稍后再试' }, 429)
+      if (await loginGuard.blocked(key)) return json({ error: '尝试次数太多，请稍后再试' }, 429)
       const password = env.ADMIN_PASSWORD || ''
       if (!password) return json({ error: '还没有设置管理员密码' }, 500)
       const given = String(body.password ?? '')
       if (!passwordsMatch(given, password)) {
-        loginGuard.fail(key)
+        await loginGuard.fail(key)
         return json({ error: '密码不对' }, 401)
       }
-      loginGuard.succeed(key)
+      await loginGuard.succeed(key)
       const secure = url.protocol === 'https:' ? '; Secure' : ''
       const token = signSession(sessionSecret(env))
       return json({ ok: true }, 200, {
