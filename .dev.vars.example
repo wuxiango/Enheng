@@ -1,0 +1,4 @@
+# 复制成 .dev.vars 给本地 `wrangler pages dev` 用，.dev.vars 不进 git。
+# 这里只放示例值，真实密码和密钥不要写进仓库。
+ADMIN_PASSWORD=change-me
+SESSION_SECRET=replace-with-at-least-32-random-characters

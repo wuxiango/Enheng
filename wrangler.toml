@@ -1,0 +1,32 @@
+# Cloudflare Pages 项目「enheng」的配置（和线上设置对齐）。
+# 密钥 ADMIN_PASSWORD / SESSION_SECRET 不写在这里：
+#   本地放 .dev.vars（参考 .dev.vars.example），线上在 Cloudflare 后台或用
+#   `wrangler pages secret put <名字> --project-name enheng` 设置。
+name = "enheng"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "enheng"
+# 真实 ID 在 Cloudflare 后台 D1 → enheng 里能看到，部署前填上。
+# 本地 `wrangler pages dev` 用的是本地模拟库，不需要真实 ID。
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "ALBUMS"
+bucket_name = "enheng-albums"
+
+# 预览环境：部署到非正式分支时用测试库和测试桶，避免测试改到正式数据。
+# 测试库、测试桶需要先建好（见 CLOUDFLARE.md），再把 ID 填进来。
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "enheng-preview"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[env.preview.r2_buckets]]
+binding = "ALBUMS"
+bucket_name = "enheng-albums-preview"
